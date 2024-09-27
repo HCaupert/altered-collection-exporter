@@ -18,7 +18,12 @@ export default function Home() {
           This project is not related altered, and is distributed freely and
           openly.
         </p>
-        <p>Code is open-source.</p>
+        <a
+          className="hover:underline"
+          href="https://github.com/HCaupert/altered-collection-exporter"
+        >
+          Code is open-source.
+        </a>
       </footer>
     </div>
   );
