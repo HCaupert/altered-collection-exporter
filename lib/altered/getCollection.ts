@@ -18,7 +18,9 @@ async function getCards({
   bearer,
   itemsPerPage = 36,
   page = 1,
+  locale,
 }: {
+  locale: string;
   bearer: string;
   itemsPerPage?: number;
   page?: number;
@@ -26,7 +28,7 @@ async function getCards({
   console.log("Fetching cards...", { itemsPerPage, page });
   return alteredApi
     .get<GetCardResponse>("cards", {
-      searchParams: { collection: true, itemsPerPage, page },
+      searchParams: { collection: true, itemsPerPage, page, locale },
       headers: headers(bearer),
     })
     .json();
@@ -36,7 +38,9 @@ async function getStats({
   bearer,
   itemsPerPage = 36,
   page = 1,
+  locale,
 }: {
+  locale: string;
   bearer: string;
   itemsPerPage?: number;
   page?: number;
@@ -44,7 +48,7 @@ async function getStats({
   console.log("Fetching collection...", { itemsPerPage, page });
   return alteredApi
     .get<GetStatsResponse>("cards/stats", {
-      searchParams: { collection: true, itemsPerPage, page },
+      searchParams: { collection: true, itemsPerPage, page, locale },
       headers: headers(bearer),
     })
     .json();
@@ -54,6 +58,7 @@ async function getPageInfo(params: {
   itemsPerPage?: number;
   page?: number;
   bearer: string;
+  locale: string;
 }) {
   const [cards, stats] = await Promise.all([
     getCards(params),
@@ -83,15 +88,15 @@ function getFields(card: Card, stats: Stats) {
   };
 }
 
-export async function getCollection(bearer: string) {
-  const init = await getCards({ itemsPerPage: 1, bearer });
+export async function getCollection(locale: string, bearer: string) {
+  const init = await getCards({ itemsPerPage: 1, bearer, locale });
 
   const total = init["hydra:totalItems"];
 
   const itemsPerPage = 36;
   const totalPages = Math.ceil(total / itemsPerPage);
   const fetches = createArray(totalPages).map((page) => {
-    return getPageInfo({ page, itemsPerPage, bearer });
+    return getPageInfo({ page, itemsPerPage, bearer, locale });
   });
 
   const responses = await Promise.all(fetches);

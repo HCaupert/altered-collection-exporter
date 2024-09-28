@@ -34,7 +34,25 @@ export default function RootLayout({
       >
         <Toaster />
         <QueryClientProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <div className="grid grid-rows-[20px_1fr_20px] min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+              <main className="flex flex-col gap-8 row-start-2 items-center">
+                {children}
+              </main>
+              <footer className="row-start-3 text-muted-foreground text-center">
+                <p>
+                  This project is not related altered, and is distributed freely
+                  and openly.
+                </p>
+                <a
+                  className="hover:underline"
+                  href="https://github.com/HCaupert/altered-collection-exporter"
+                >
+                  Code is open-source.
+                </a>
+              </footer>
+            </div>
+          </AuthProvider>
         </QueryClientProvider>
       </body>
     </html>

@@ -4,16 +4,27 @@ import { useAuth } from "@/app/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { Collection, getCollection } from "@/lib/altered/getCollection";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { createCSV } from "@/lib/createCsv";
 import Link from "next/link";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 function useExportCollection() {
-  const { bearer } = useAuth();
+  const { bearer, checkExpiry } = useAuth();
 
   return useMutation({
-    mutationFn: () => getCollection(bearer!),
+    mutationFn: ({ locale }: { locale: string }) => {
+      checkExpiry();
+      return getCollection(locale, bearer!);
+    },
     onSuccess: (collection) => {
       toast(`Export successful`, {
         description: `${collection.length} / ${collection.total} cards`,
@@ -25,16 +36,44 @@ function useExportCollection() {
   });
 }
 
+const AvailableLocales = ["fr-fr", "en-us"] as const;
+type AvailableLocales = (typeof AvailableLocales)[number];
+
+function findDefaultLocale(): AvailableLocales {
+  const language = navigator.language.toLowerCase() as AvailableLocales;
+
+  return AvailableLocales.includes(language) ? language : "en-us";
+}
+
 export function ExportForm() {
   const { user } = useAuth();
   const { mutate, isPending, data } = useExportCollection();
+  const [locale, setLocale] = useState(findDefaultLocale());
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <h3>
         Hello <span className="font-bold">{user!.name}</span>
       </h3>
-      <Button onClick={() => mutate()} disabled={isPending}>
+      <p className="text-muted-foreground text-sm">
+        You are connected until {new Date(user!.exp).toLocaleTimeString()}
+      </p>
+      <Label className="space-y-2">
+        <span>Language</span>
+        <Select
+          value={locale}
+          onValueChange={(e) => setLocale(e as AvailableLocales)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Language" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="fr-fr">French</SelectItem>
+            <SelectItem value="en-us">English</SelectItem>
+          </SelectContent>
+        </Select>
+      </Label>
+      <Button onClick={() => mutate({ locale })} disabled={isPending}>
         {isPending ? "Creating..." : "Create export"}
       </Button>
       {data && <DownloadButton collection={data} />}
@@ -50,7 +89,7 @@ function DownloadButton({ collection }: { collection: Collection }) {
   }, []);
 
   return (
-    <Button variant="link" asChild>
+    <Button variant="link" asChild className="animate-bounce">
       <Link href={url}>download csv export</Link>
     </Button>
   );
