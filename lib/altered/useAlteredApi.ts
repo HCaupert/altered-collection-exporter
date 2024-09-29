@@ -15,27 +15,13 @@ export function useAlteredApi() {
     },
   });
 
-  async function getCards({
-    itemsPerPage = 36,
-    page = 1,
-    locale,
-  }: AlteredPageParams) {
-    return alteredApi
-      .get<GetCardResponse>("cards", {
-        searchParams: { collection: true, itemsPerPage, page, locale },
-      })
-      .json();
+  async function getCards(searchParams: AlteredPageParams) {
+    return alteredApi.get<GetCardResponse>("cards", { searchParams }).json();
   }
 
-  async function getStats({
-    itemsPerPage = 36,
-    page = 1,
-    locale,
-  }: AlteredPageParams) {
+  async function getStats(searchParams: AlteredPageParams) {
     return alteredApi
-      .get<GetStatsResponse>("cards/stats", {
-        searchParams: { collection: true, itemsPerPage, page, locale },
-      })
+      .get<GetStatsResponse>("cards/stats", { searchParams })
       .json();
   }
 

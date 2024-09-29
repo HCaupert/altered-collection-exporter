@@ -2,11 +2,15 @@ import { Stats } from "@/lib/altered/collection";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAlteredApi } from "@/lib/altered/useAlteredApi";
-import { mapCardsToElement } from "@/lib/altered/mapCardsToElement";
+import {
+  mapCardsToElement,
+  updateGlobalOwn,
+} from "@/lib/altered/mapCardsToElement";
 import { createArray } from "@/lib/utils/createArray";
 import { InferMutationResult } from "@/lib/utils/inferMutationResult";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { AlteredPageParams } from "@/lib/altered/AlteredPageParams";
+import { db } from "@/lib/db/db";
 
 export function useGetCollection() {
   const { getStats, getCards } = useAlteredApi();
@@ -31,36 +35,64 @@ export function useGetCollection() {
     );
   }
 
-  async function getCollection(locale: string) {
-    const init = await getCards({ itemsPerPage: 1, locale });
+  async function fetchAllPages(params: AlteredPageParams) {
+    const init = await getCards({ ...params, itemsPerPage: 1 });
 
     const total = init["hydra:totalItems"];
 
     const itemsPerPage = 36;
     const totalPages = Math.ceil(total / itemsPerPage);
+
+    console.log(
+      `Found ${total} items, fetching ${totalPages} pages of cards and stats.`,
+    );
     const fetches = createArray(totalPages).map((page) => {
-      return getPageInfo({ page, itemsPerPage, locale });
+      return getPageInfo({ ...params, page, itemsPerPage });
     });
 
     const responses = await Promise.all(fetches);
 
-    const cards = responses.reduce((previousValue, currentValue) => [
+    console.log(`Fetch completed. Joining results.`);
+    return responses.reduce((previousValue, currentValue) => [
       ...previousValue,
       ...currentValue,
     ]);
+  }
+
+  async function getCollection(locale: string) {
+    console.log("Starting collection export. Fetching non unique cards");
+    const nonUniqueCards = await fetchAllPages({ locale });
+    console.log("Non unique cards fetched, fetching unique");
+    const uniqueCards = await fetchAllPages({
+      locale,
+      "rarity[]": "UNIQUE",
+      collection: true,
+    });
+
+    const cards = uniqueCards.concat(nonUniqueCards);
     const length = cards.length;
 
-    return { cards, total, length };
+    console.log(
+      `Collection joined for ${length} card, calculating global possession.`,
+    );
+
+    updateGlobalOwn(cards);
+
+    console.log(`Calculation complete.`);
+
+    return { cards, length };
   }
 
   return useMutation({
-    mutationFn: ({ locale }: { locale: string }) => {
+    mutationFn: async ({ locale }: { locale: string }) => {
       checkExpiry();
-      return getCollection(locale);
+      const collection = await getCollection(locale);
+      await db.cards.bulkPut(collection.cards);
+      return collection;
     },
     onSuccess: (collection) => {
       toast(`Export successful`, {
-        description: `${collection.length} / ${collection.total} cards`,
+        description: `${collection.length} cards`,
       });
     },
     onMutate: () => {

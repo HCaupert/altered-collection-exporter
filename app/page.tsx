@@ -1,5 +1,6 @@
 import { ExportForm } from "@/lib/export/ExportForm";
 import { AuthPortal } from "@/lib/auth/AuthPortal";
+import { CollectionInfo } from "@/lib/collectioninfo/collectionInfo";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
         ACE
       </h1>
       <h2>A simple Altered Collection Exporter</h2>
+      <CollectionInfo />
       <AuthPortal>
         <ExportForm />
       </AuthPortal>

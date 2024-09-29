@@ -35,11 +35,11 @@ export default function RootLayout({
         <Toaster />
         <QueryClientProvider>
           <AuthProvider>
-            <div className="grid grid-rows-[20px_1fr_20px] min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-              <main className="flex flex-col gap-8 row-start-2 items-center">
+            <div className="flex flex-col min-h-screen p-8 pb-20 gap-16 sm:p-12 font-[family-name:var(--font-geist-sans)]">
+              <main className="flex flex-col gap-8 items-center grow">
                 {children}
               </main>
-              <footer className="row-start-3 text-muted-foreground text-center">
+              <footer className="text-muted-foreground text-center">
                 <p>
                   This project is not related altered, and is distributed freely
                   and openly.

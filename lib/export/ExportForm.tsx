@@ -55,7 +55,6 @@ export function ExportForm() {
       <Button onClick={() => mutate({ locale })} disabled={isPending}>
         {isPending ? "Creating..." : "Create export"}
       </Button>
-      {data && <DownloadButton collection={data} />}
     </div>
   );
 }
