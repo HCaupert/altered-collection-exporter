@@ -1,113 +1,72 @@
-import ky from "ky";
-import { GetCardResponse, Card } from "@/lib/altered/cards";
-import { GetStatsResponse, Stats } from "@/lib/altered/collection";
+import { Stats } from "@/lib/altered/collection";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useAlteredApi } from "@/lib/altered/useAlteredApi";
+import { mapCardsToElement } from "@/lib/altered/mapCardsToElement";
+import { createArray } from "@/lib/utils/createArray";
+import { InferMutationResult } from "@/lib/utils/inferMutationResult";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { AlteredPageParams } from "@/lib/altered/AlteredPageParams";
 
-const headers = (bearer: string) => ({
-  authorization: `Bearer ${bearer}`,
-  accept: "*/*",
-});
+export function useGetCollection() {
+  const { getStats, getCards } = useAlteredApi();
+  const { checkExpiry } = useAuth();
 
-export const alteredApi = ky.create({
-  prefixUrl: "https://api.altered.gg",
-});
+  async function getPageInfo(params: AlteredPageParams) {
+    const [cards, stats] = await Promise.all([
+      getCards(params),
+      getStats(params),
+    ]);
 
-const createArray = (n: number): number[] =>
-  Array.from({ length: n }, (_, i) => i + 1);
+    const statsMap = stats["hydra:member"].reduce(
+      (acc, stat) => {
+        acc[stat.reference] = stat;
+        return acc;
+      },
+      {} as Record<string, Stats>,
+    );
 
-async function getCards({
-  bearer,
-  itemsPerPage = 36,
-  page = 1,
-  locale,
-}: {
-  locale: string;
-  bearer: string;
-  itemsPerPage?: number;
-  page?: number;
-}) {
-  console.log("Fetching cards...", { itemsPerPage, page });
-  return alteredApi
-    .get<GetCardResponse>("cards", {
-      searchParams: { collection: true, itemsPerPage, page, locale },
-      headers: headers(bearer),
-    })
-    .json();
-}
+    return cards["hydra:member"].map((card) =>
+      mapCardsToElement(card, statsMap[card.reference]),
+    );
+  }
 
-async function getStats({
-  bearer,
-  itemsPerPage = 36,
-  page = 1,
-  locale,
-}: {
-  locale: string;
-  bearer: string;
-  itemsPerPage?: number;
-  page?: number;
-}) {
-  console.log("Fetching collection...", { itemsPerPage, page });
-  return alteredApi
-    .get<GetStatsResponse>("cards/stats", {
-      searchParams: { collection: true, itemsPerPage, page, locale },
-      headers: headers(bearer),
-    })
-    .json();
-}
+  async function getCollection(locale: string) {
+    const init = await getCards({ itemsPerPage: 1, locale });
 
-async function getPageInfo(params: {
-  itemsPerPage?: number;
-  page?: number;
-  bearer: string;
-  locale: string;
-}) {
-  const [cards, stats] = await Promise.all([
-    getCards(params),
-    getStats(params),
-  ]);
+    const total = init["hydra:totalItems"];
 
-  const statsMap = stats["hydra:member"].reduce(
-    (acc, stat) => {
-      acc[stat.reference] = stat;
-      return acc;
+    const itemsPerPage = 36;
+    const totalPages = Math.ceil(total / itemsPerPage);
+    const fetches = createArray(totalPages).map((page) => {
+      return getPageInfo({ page, itemsPerPage, locale });
+    });
+
+    const responses = await Promise.all(fetches);
+
+    const cards = responses.reduce((previousValue, currentValue) => [
+      ...previousValue,
+      ...currentValue,
+    ]);
+    const length = cards.length;
+
+    return { cards, total, length };
+  }
+
+  return useMutation({
+    mutationFn: ({ locale }: { locale: string }) => {
+      checkExpiry();
+      return getCollection(locale);
     },
-    {} as Record<string, Stats>,
-  );
-
-  return cards["hydra:member"].map((card) =>
-    getFields(card, statsMap[card.reference]),
-  );
-}
-
-function getFields(card: Card, stats: Stats) {
-  return {
-    rarity: card.rarity.reference,
-    name: card.name,
-    reference: card.reference,
-    faction: card.mainFaction.name,
-    amount: stats.inMyCollection,
-  };
-}
-
-export async function getCollection(locale: string, bearer: string) {
-  const init = await getCards({ itemsPerPage: 1, bearer, locale });
-
-  const total = init["hydra:totalItems"];
-
-  const itemsPerPage = 36;
-  const totalPages = Math.ceil(total / itemsPerPage);
-  const fetches = createArray(totalPages).map((page) => {
-    return getPageInfo({ page, itemsPerPage, bearer, locale });
+    onSuccess: (collection) => {
+      toast(`Export successful`, {
+        description: `${collection.length} / ${collection.total} cards`,
+      });
+    },
+    onMutate: () => {
+      toast("Export started...");
+    },
   });
-
-  const responses = await Promise.all(fetches);
-
-  const cards = responses.reduce((previousValue, currentValue) => [
-    ...previousValue,
-    ...currentValue,
-  ]);
-  const length = cards.length;
-
-  return { cards, total, length };
 }
 
-export type Collection = Awaited<ReturnType<typeof getCollection>>;
+export type Collection = InferMutationResult<typeof useGetCollection>;

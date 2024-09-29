@@ -1,13 +1,10 @@
 "use client";
 
-import { useAuth } from "@/app/AuthProvider";
 import { Button } from "@/components/ui/button";
-import { useMutation } from "@tanstack/react-query";
-import { Collection, getCollection } from "@/lib/altered/getCollection";
+import { Collection, useGetCollection } from "@/lib/altered/getCollection";
 import { useMemo, useState } from "react";
 import { createCSV } from "@/lib/createCsv";
 import Link from "next/link";
-import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -16,25 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-
-function useExportCollection() {
-  const { bearer, checkExpiry } = useAuth();
-
-  return useMutation({
-    mutationFn: ({ locale }: { locale: string }) => {
-      checkExpiry();
-      return getCollection(locale, bearer!);
-    },
-    onSuccess: (collection) => {
-      toast(`Export successful`, {
-        description: `${collection.length} / ${collection.total} cards`,
-      });
-    },
-    onMutate: () => {
-      toast("Export started...");
-    },
-  });
-}
+import { useAuth } from "@/lib/auth/AuthProvider";
 
 const AvailableLocales = ["fr-fr", "en-us"] as const;
 type AvailableLocales = (typeof AvailableLocales)[number];
@@ -47,7 +26,7 @@ function findDefaultLocale(): AvailableLocales {
 
 export function ExportForm() {
   const { user } = useAuth();
-  const { mutate, isPending, data } = useExportCollection();
+  const { mutate, isPending, data } = useGetCollection();
   const [locale, setLocale] = useState(findDefaultLocale());
 
   return (

@@ -4,8 +4,8 @@ import { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/app/AuthProvider";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth/AuthProvider";
 
 export function AuthPortal({ children }: { children: ReactNode }) {
   const { setAuth, bearer } = useAuth();

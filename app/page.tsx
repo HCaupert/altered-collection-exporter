@@ -1,5 +1,5 @@
-import { AuthPortal } from "@/app/AuthPortal";
-import { ExportForm } from "@/app/ExportForm";
+import { ExportForm } from "@/lib/export/ExportForm";
+import { AuthPortal } from "@/lib/auth/AuthPortal";
 
 export default function Home() {
   return (
