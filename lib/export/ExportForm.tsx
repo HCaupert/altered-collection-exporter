@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { ArrowRight } from "lucide-react";
 
 const AvailableLocales = ["fr-fr", "en-us"] as const;
 type AvailableLocales = (typeof AvailableLocales)[number];
@@ -55,6 +56,15 @@ export function ExportForm() {
       <Button onClick={() => mutate({ locale })} disabled={isPending}>
         {isPending ? "Creating..." : "Create export"}
       </Button>
+      {data && <DownloadButton collection={data} />}
+      {data && (
+        <Button asChild className="gap-2" variant="secondary">
+          <Link href="/collection">
+            Go to your Collection
+            <ArrowRight />
+          </Link>
+        </Button>
+      )}
     </div>
   );
 }
