@@ -23,6 +23,7 @@ import { StatsCell } from "@/lib/card-table/statsCell";
 import { TypeBadge } from "@/lib/card-table/typeBadge";
 import { CenteredCell } from "@/lib/card-table/centeredCell";
 import { CollectionCell } from "@/lib/card-table/collectionCell";
+import { useKeyDownNavigateTable } from "@/lib/card-table/useKeyDownNavigateTable";
 
 const columns: ColumnDef<Card>[] = [
   {
@@ -141,6 +142,8 @@ export function CollectionContent() {
     },
   });
 
+  useKeyDownNavigateTable(table);
+
   const [tableState, setTableState] = useQueryState<TableState>("table", {
     ...parseAsJson(),
     defaultValue: table.initialState,
@@ -153,7 +156,19 @@ export function CollectionContent() {
   }));
 
   useEffect(() => {
-    table.getRowModel().rows[0]?.toggleSelected(true);
+    console.log(
+      table.getRowModel().rows.map((row) => ({
+        selected: row.getIsSelected(),
+        index: row.index,
+      })),
+    );
+    const anyRowSelected = !!table
+      .getRowModel()
+      .rows.find((row) => row.getIsSelected());
+
+    if (!anyRowSelected) {
+      table.getRowModel().rows[0]?.toggleSelected(true);
+    }
   }, [table.getRowModel().rows[0]?.original.reference]);
 
   const selected = table.getSelectedRowModel().rows[0]?.original;
