@@ -30,6 +30,7 @@ export function useKeyDown(
     (event: Event) => {
       if (!(event instanceof KeyboardEvent)) return;
       if (event.key === key) {
+        event.preventDefault();
         callbackRef.current(event);
       }
     },

@@ -12,7 +12,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { parseAsJson, useQueryState } from "nuqs";
-import { useEffect } from "react";
 import { CardTableToolBar } from "@/lib/card-table/cardTableToolBar";
 import { DataTable } from "@/components/ui/data-table";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
@@ -23,16 +22,17 @@ import { StatsCell } from "@/lib/card-table/statsCell";
 import { TypeBadge } from "@/lib/card-table/typeBadge";
 import { CenteredCell } from "@/lib/card-table/centeredCell";
 import { CollectionCell } from "@/lib/card-table/collectionCell";
-import { useKeyDownNavigateTable } from "@/lib/card-table/useKeyDownNavigateTable";
+import { useTableSelection } from "@/lib/card-table/useTableSelection";
+import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 
 const columns: ColumnDef<Card>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: DataTableColumnHeader,
   },
   {
     accessorKey: "faction",
-    header: "Faction",
+    header: DataTableColumnHeader,
     cell: FactionBadge,
     filterFn: "arrIncludesSome",
   },
@@ -142,8 +142,6 @@ export function CollectionContent() {
     },
   });
 
-  useKeyDownNavigateTable(table);
-
   const [tableState, setTableState] = useQueryState<TableState>("table", {
     ...parseAsJson(),
     defaultValue: table.initialState,
@@ -155,21 +153,7 @@ export function CollectionContent() {
     onStateChange: setTableState,
   }));
 
-  useEffect(() => {
-    console.log(
-      table.getRowModel().rows.map((row) => ({
-        selected: row.getIsSelected(),
-        index: row.index,
-      })),
-    );
-    const anyRowSelected = !!table
-      .getRowModel()
-      .rows.find((row) => row.getIsSelected());
-
-    if (!anyRowSelected) {
-      table.getRowModel().rows[0]?.toggleSelected(true);
-    }
-  }, [table.getRowModel().rows[0]?.original.reference]);
+  useTableSelection(table);
 
   const selected = table.getSelectedRowModel().rows[0]?.original;
 

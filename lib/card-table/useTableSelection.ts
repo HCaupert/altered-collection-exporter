@@ -1,7 +1,9 @@
 import { Table } from "@tanstack/react-table";
 import { useKeyDown } from "@/lib/keydown/useKeyDown";
+import { useEffect } from "react";
+import { Card } from "@/lib/core/Card";
 
-export function useKeyDownNavigateTable<TData>(table: Table<TData>) {
+export function useTableSelection(table: Table<Card>) {
   useKeyDown("ArrowDown", () => {
     const targetIndex =
       (table.getSelectedRowModel().rows[0].index + 1) %
@@ -32,10 +34,20 @@ export function useKeyDownNavigateTable<TData>(table: Table<TData>) {
   });
 
   useKeyDown("ArrowRight", () => {
-    table.nextPage();
+    table.getCanNextPage() && table.nextPage();
   });
 
   useKeyDown("ArrowLeft", () => {
     table.previousPage();
   });
+
+  useEffect(() => {
+    const anyRowSelected = !!table
+      .getRowModel()
+      .rows.find((row) => row.getIsSelected());
+
+    if (!anyRowSelected) {
+      table.getRowModel().rows[0]?.toggleSelected(true);
+    }
+  }, [table.getRowModel().rows[0]?.original.reference]);
 }
