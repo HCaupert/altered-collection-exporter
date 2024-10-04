@@ -1,10 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Collection, useGetCollection } from "@/lib/altered/getCollection";
-import { useMemo, useState } from "react";
-import { createCSV } from "@/lib/createCsv";
-import Link from "next/link";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { FormEventHandler, useState } from "react";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -12,39 +10,65 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { useAuth } from "@/lib/auth/AuthProvider";
-import { ArrowRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { jwtDecode } from "jwt-decode";
 
 const AvailableLocales = ["fr-fr", "en-us"] as const;
 type AvailableLocales = (typeof AvailableLocales)[number];
 
 function findDefaultLocale(): AvailableLocales {
   const language = navigator.language.toLowerCase() as AvailableLocales;
-
   return AvailableLocales.includes(language) ? language : "en-us";
 }
 
-export function ExportForm() {
-  const { user } = useAuth();
-  const { mutate, isPending, data } = useGetCollection();
+function isValidJwt(s: any) {
+  if (typeof s !== "string") return false;
+  try {
+    jwtDecode(s);
+    return true;
+  } catch (e) {}
+  return false;
+}
+
+export function ExportForm({
+  createExport,
+  empty,
+}: {
+  createExport: ({
+    locale,
+    bearer,
+  }: {
+    locale: AvailableLocales;
+    bearer: string;
+  }) => void;
+  empty: boolean;
+}) {
+  const { bearer } = useAuth();
   const [locale, setLocale] = useState(findDefaultLocale());
+  const [bearerInput, setBearerInput] = useState(bearer ?? "");
+
+  const submit: FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    createExport({ locale, bearer: bearerInput });
+  };
+
+  const bearerIsValid = isValidJwt(bearerInput);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <h3>
-        Hello <span className="font-bold">{user!.name}</span>
-      </h3>
-      <p className="text-muted-foreground text-sm">
-        You are connected until {new Date(user!.exp).toLocaleTimeString()}
-      </p>
-      <Label className="space-y-2">
-        <span>Language</span>
+    <form onSubmit={submit}>
+      <div className="grid grid-cols-2 gap-2 mb-6">
+        <Label>Language</Label>
+        <Label>
+          Your Auth <span className="text-destructive">*</span>
+        </Label>
         <Select
           value={locale}
           onValueChange={(e) => setLocale(e as AvailableLocales)}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger>
             <SelectValue placeholder="Language" />
           </SelectTrigger>
           <SelectContent>
@@ -52,33 +76,30 @@ export function ExportForm() {
             <SelectItem value="en-us">English</SelectItem>
           </SelectContent>
         </Select>
-      </Label>
-      <Button onClick={() => mutate({ locale })} disabled={isPending}>
-        {isPending ? "Creating..." : "Create export"}
-      </Button>
-      {data && <DownloadButton collection={data} />}
-      {data && (
-        <Button asChild className="gap-2" variant="secondary">
-          <Link href="/collection">
-            Go to your Collection
-            <ArrowRight />
-          </Link>
-        </Button>
+        <Input
+          onChange={(e) => setBearerInput(e.target.value)}
+          value={bearerInput}
+          autoFocus
+          type="password"
+          autoComplete="false"
+          className={cn(
+            bearerIsValid
+              ? "border-green-300 focus-visible:ring-green-300"
+              : "border-destructive focus-visible:ring-destructive",
+          )}
+          placeholder="Probably a weird thing..."
+        />
+      </div>
+      {!empty && (
+        <p className="text-muted-foreground text-sm mb-4 font-light">
+          Note that making a new export will reset your current collection.
+        </p>
       )}
-    </div>
-  );
-}
-
-function DownloadButton({ collection }: { collection: Collection }) {
-  const url = useMemo(() => {
-    const csv = createCSV(collection.cards);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8," });
-    return URL.createObjectURL(blob);
-  }, []);
-
-  return (
-    <Button variant="link" asChild className="animate-bounce">
-      <Link href={url}>download csv export</Link>
-    </Button>
+      <DialogFooter>
+        <Button type="submit" disabled={!bearerIsValid}>
+          Export
+        </Button>
+      </DialogFooter>
+    </form>
   );
 }

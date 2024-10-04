@@ -7,6 +7,7 @@ import { toast } from "sonner";
 interface User {
   name: string;
   exp: number;
+  email: string;
 }
 
 interface AuthContextType {
@@ -49,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const jwt: any = jwtDecode(bearer);
     return {
       name: jwt.given_name,
+      email: jwt.email,
       exp: jwt.exp * 1000,
     };
   }

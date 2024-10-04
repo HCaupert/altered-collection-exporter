@@ -12,9 +12,9 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { AlteredPageParams } from "@/lib/altered/AlteredPageParams";
 import { db } from "@/lib/db/db";
 
-export function useGetCollection() {
+export function useExportCollection() {
   const { getStats, getCards } = useAlteredApi();
-  const { checkExpiry } = useAuth();
+  const auth = useAuth();
 
   async function getPageInfo(params: AlteredPageParams) {
     const [cards, stats] = await Promise.all([
@@ -85,9 +85,10 @@ export function useGetCollection() {
 
   return useMutation({
     mutationFn: async ({ locale }: { locale: string }) => {
-      checkExpiry();
+      auth.checkExpiry();
       const collection = await getCollection(locale);
       await db.cards.bulkPut(collection.cards);
+      await db.exports.put({ email: auth.user!.email, date: new Date() });
       return collection;
     },
     onSuccess: (collection) => {
@@ -101,4 +102,4 @@ export function useGetCollection() {
   });
 }
 
-export type Collection = InferMutationResult<typeof useGetCollection>;
+export type Collection = InferMutationResult<typeof useExportCollection>;

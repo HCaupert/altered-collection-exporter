@@ -19,6 +19,7 @@ export default function AuthPage() {
           Go to the{" "}
           <Link
             href="https://www.altered.gg/cards"
+            target="_blank"
             className="underline hover:no-underline"
           >
             Altered website,
@@ -52,6 +53,9 @@ export default function AuthPage() {
             </li>
             <li>Copy it's value, and that's it!</li>
           </ul>
+        </li>
+        <li>
+          You can know hit the '<b>+</b>' button again in the navbar
         </li>
       </ul>
       <Image

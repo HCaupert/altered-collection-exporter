@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { QueryClientProvider } from "@/lib/reactquery/QueryClientProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
+import { NavBar } from "@/lib/nav/NavBar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,12 +31,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased font-[family-name:var(--font-geist-sans)]`}
       >
         <Toaster />
         <QueryClientProvider>
           <AuthProvider>
-            <div className="flex flex-col min-h-screen p-8 pb-20 gap-16 sm:p-12 font-[family-name:var(--font-geist-sans)]">
+            <div className="flex flex-col min-h-screen px-8 pt-2 pb-4 gap-16 relative container mx-auto">
+              <NavBar />
               <main className="flex flex-col gap-8 items-center grow">
                 {children}
               </main>

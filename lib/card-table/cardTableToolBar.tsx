@@ -33,8 +33,8 @@ function FilterCategory({
 
 export function CardTableToolBar({ table }: { table: Table<Card> }) {
   return (
-    <div className="flex flex-col w-full flex-wrap gap-2">
-      <div className="flex w-full gap-2">
+    <div className="flex flex-col w-full flex-wrap gap-3 mb-10">
+      <div className="flex w-full gap-3">
         <Input
           placeholder="Search"
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -52,7 +52,7 @@ export function CardTableToolBar({ table }: { table: Table<Card> }) {
         </Button>
         <DataTableViewOptions table={table} />
       </div>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-3">
         <FilterCategory label="Edition">
           <DataTableFacetedFilter
             options={editionFilter}

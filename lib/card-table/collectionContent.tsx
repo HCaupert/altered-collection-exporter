@@ -3,6 +3,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db/db";
 import {
+  CellContext,
   ColumnDef,
   getCoreRowModel,
   getFilteredRowModel,
@@ -25,10 +26,15 @@ import { CollectionCell } from "@/lib/card-table/collectionCell";
 import { useTableSelection } from "@/lib/card-table/useTableSelection";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 
+function NameCell(context: CellContext<Card, unknown>) {
+  return <span className="line-clamp-1">{context.getValue() as string}</span>;
+}
+
 const columns: ColumnDef<Card>[] = [
   {
     accessorKey: "name",
     header: DataTableColumnHeader,
+    cell: NameCell,
   },
   {
     accessorKey: "faction",
