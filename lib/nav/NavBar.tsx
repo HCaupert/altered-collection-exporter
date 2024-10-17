@@ -21,9 +21,9 @@ function LastExport() {
 export function NavBar() {
   return (
     <>
-      <nav className="h-16 flex items-center p-8 fixed -translate-x-1/2 left-[50%] backdrop-blur z-50 w-[90%] shadow rounded-full group gap-5 max-w-5xl">
+      <nav className="h-16 flex items-center p-8 fixed -translate-x-1/2 left-[50%] backdrop-blur z-50 w-[90%] shadow rounded-full group gap-5 max-w-5xl bg-background/80">
         <Link href="/" className="text-xl font-semibold">
-          MyAltered
+          MyAltCollection
         </Link>
         <div className="grow" />
         <CsvExportButton />

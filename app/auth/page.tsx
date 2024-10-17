@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { QA } from "@/lib/qa/QA";
 
 export default function AuthPage() {
   return (
@@ -65,6 +66,7 @@ export default function AuthPage() {
         height="300"
         className="object-cover rounded-lg"
       />
+      <QA />
     </>
   );
 }

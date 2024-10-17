@@ -19,8 +19,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Altered Collection Exporter",
-  description: "Simple yet powerful collection exported for Altered TCG",
+  title: "My Altered Collection",
+  description: "Simple yet powerful collection exporter for Altered TCG",
 };
 
 export default function RootLayout({
@@ -41,17 +41,28 @@ export default function RootLayout({
               <main className="flex flex-col gap-8 items-center grow">
                 {children}
               </main>
-              <footer className="text-muted-foreground text-center">
+              <footer className="text-muted-foreground text-center text-sm">
                 <p>
-                  This project is not related altered, and is distributed freely
-                  and openly.
+                  Equinox, Altered, and their logos are trademarks of Equinox.
+                  © 2023-2024 Equinox. All Rights Reserved.{" "}
                 </p>
-                <a
-                  className="hover:underline"
-                  href="https://github.com/HCaupert/altered-collection-exporter"
-                >
-                  Code is open-source.
-                </a>
+                <p>
+                  My Altered Collection is not affiliated with, endorsed,
+                  sponsored, or specifically approved by Equinox.
+                </p>
+                <p>
+                  My Altered Collection is developed and maintained by Hukoper,
+                  this project is fanwork.
+                </p>
+                <p>
+                  This project is distributed freely and openly.{" "}
+                  <a
+                    className="hover:underline"
+                    href="https://github.com/HCaupert/altered-collection-exporter"
+                  >
+                    Code is open-source.
+                  </a>
+                </p>
               </footer>
             </div>
           </AuthProvider>
