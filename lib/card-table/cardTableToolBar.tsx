@@ -15,6 +15,7 @@ import {
 import { DataTableViewOptions } from "@/components/ui/data-table-view-options";
 import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
+import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 
 function FilterCategory({
   label,
@@ -41,11 +42,18 @@ export function CardTableToolBar({ table }: { table: Table<Card> }) {
           onChange={(event) => {
             table.getColumn("name")?.setFilterValue(event.target.value);
           }}
-          className="h-8 max-w-sm"
+          className="h-8 max-w-xs"
         />
         <Button
+          onClick={() => table.getColumn("name")?.setFilterValue("")}
           variant="ghost"
-          className="h-8"
+          className="h-8 p-1 text-muted-foreground"
+        >
+          <CloseIcon />
+        </Button>
+        <Button
+          variant="ghost"
+          className="h-8 text-muted-foreground"
           onClick={() => table.resetColumnFilters()}
         >
           Clear filters
