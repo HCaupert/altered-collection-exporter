@@ -51,16 +51,19 @@ export default function RootLayout({
                   sponsored, or specifically approved by Equinox.
                 </p>
                 <p>
-                  My Altered Collection is developed and maintained by Hukoper,
-                  this project is fanwork.
-                </p>
-                <p>
-                  This project is distributed freely and openly.{" "}
                   <a
                     className="hover:underline"
                     href="https://github.com/HCaupert/altered-collection-exporter"
                   >
-                    Code is open-source.
+                    Code is open-source, platform is free. By HCaupert.
+                  </a>
+                </p>
+                <p className="mt-4">
+                  <a
+                    className="hover:underline font-bold"
+                    href="https://paypal.me/hcaupert?country.x=FR&locale.x=fr_FR"
+                  >
+                    Buy me a booster (or more 😛).
                   </a>
                 </p>
               </footer>
