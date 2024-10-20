@@ -11,6 +11,7 @@ import {
   rarityFilters,
   statFilter,
   typeFilters,
+  wishListedFilter,
 } from "@/lib/card-table/filters";
 import { DataTableViewOptions } from "@/components/ui/data-table-view-options";
 import { Button } from "@/components/ui/button";
@@ -129,6 +130,13 @@ export function CardTableToolBar({ table }: { table: Table<Card> }) {
             options={possessionFilters}
             title="Edition"
             column={table.getColumn("possession")}
+          />
+        </FilterCategory>
+        <FilterCategory label="Tagged">
+          <DataTableFacetedFilter
+            options={wishListedFilter}
+            title="Wishlist"
+            column={table.getColumn("wishListed")}
           />
         </FilterCategory>
       </div>

@@ -1,7 +1,8 @@
 import { DataTableFilter } from "@/components/ui/data-table-faceted-filter";
 import { Edition, Possession } from "@/lib/altered/mapCardsToElement";
 
-type Filters<S extends string = string> = DataTableFilter<S>[];
+type Filters<S extends keyof any | boolean = string> = DataTableFilter<S>[];
+
 export const rarityFilters: Filters = [
   {
     value: "COMMON",
@@ -70,4 +71,9 @@ export const possessionFilters: Filters<Possession> = [
   { value: "MISSING", label: "Missing (1-2)" },
   { value: "COMPLETE", label: "Complete (3)" },
   { value: "EXCESS", label: "Excess (4+)" },
+];
+
+export const wishListedFilter: Filters<boolean> = [
+  { value: true, label: "Wishlisted" },
+  { value: false, label: "None" },
 ];

@@ -9,7 +9,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
@@ -21,7 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 
-export type DataTableFilter<S extends string = string> = {
+export type DataTableFilter<S extends keyof any | boolean = string> = {
   label: string;
   value: S;
   icon?: React.ComponentType<{ className?: string }>;

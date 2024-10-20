@@ -3,7 +3,6 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/db/db";
 import {
-  CellContext,
   ColumnDef,
   getCoreRowModel,
   getFilteredRowModel,
@@ -25,10 +24,9 @@ import { CenteredCell } from "@/lib/card-table/centeredCell";
 import { CollectionCell } from "@/lib/card-table/collectionCell";
 import { useTableSelection } from "@/lib/card-table/useTableSelection";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
-
-function NameCell(context: CellContext<Card, unknown>) {
-  return <span className="line-clamp-1">{context.getValue() as string}</span>;
-}
+import { WishListCell } from "@/lib/card-table/wishListCell";
+import { booleanContains } from "@/lib/card-table/booleanContains";
+import { NameCell } from "@/lib/card-table/nameCell";
 
 const columns: ColumnDef<Card>[] = [
   {
@@ -63,6 +61,12 @@ const columns: ColumnDef<Card>[] = [
     header: "Type",
     cell: TypeBadge,
     filterFn: "arrIncludesSome",
+  },
+  {
+    accessorKey: "wishListed",
+    header: "Wishlisted",
+    filterFn: booleanContains,
+    cell: WishListCell,
   },
   {
     accessorKey: "forest",
@@ -133,6 +137,7 @@ export function CollectionContent() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     enableMultiRowSelection: false,
+    autoResetPageIndex: false,
     initialState: {
       columnVisibility: {
         forest: false,
