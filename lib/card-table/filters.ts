@@ -31,6 +31,8 @@ export const typeFilters: Filters = [
   { value: "HERO", label: "Hero" },
   { value: "CHARACTER", label: "Character" },
   { value: "PERMANENT", label: "Permanent" },
+  { value: "LANDMARK_PERMANENT", label: "Landmark Permanent" },
+  { value: "EXPEDITION_PERMANENT", label: "Expedition Permanent" },
   { value: "SPELL", label: "Spell" },
   { value: "TOKEN_MANA", label: "Mana" },
   { value: "TOKEN", label: "Token" },
@@ -62,8 +64,9 @@ export const promoFilter: Filters = [
 ];
 
 export const editionFilter: Filters<Edition> = [
-  { value: "COREKS", label: "KickStarter" },
-  { value: "CORE_", label: "Core" },
+  { value: "COREKS", label: "KS" },
+  { value: "CORE_", label: "BTG" },
+  { value: "ALIZE", label: "TBF" },
 ];
 
 export const possessionFilters: Filters<Possession> = [

@@ -15,9 +15,15 @@ export const mapCardsToElement = (card: AlteredCard, stats: Stats) => ({
   ocean: card.elements.OCEAN_POWER,
   forest: card.elements.FOREST_POWER,
   mountain: card.elements.MOUNTAIN_POWER,
-  edition: card.reference.includes("COREKS")
-    ? ("COREKS" as const)
-    : ("CORE_" as const),
+  edition: (() => {
+    if (card.reference.includes("COREKS")) {
+      return "COREKS";
+    }
+    if (card.reference.includes("ALIZE")) {
+      return "ALIZE";
+    }
+    return "CORE_";
+  })(),
   promo: card.cardProduct.reference,
   possession: calculatePossession(stats.inMyCollection) as Possession,
   globalPossession: calculatePossession(0) as Possession, // yet
